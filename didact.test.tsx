@@ -1,4 +1,4 @@
-import Didact from "./index";
+import Didact from "./didact";
 import { fireEvent, findByText } from "@testing-library/dom";
 
 afterEach(() => {
@@ -72,4 +72,40 @@ test("can assign event handlers", async () => {
   fireEvent.click(button);
 
   expect(onClick).toHaveBeenCalled();
+});
+
+test("can render function components", async () => {
+  function App(props) {
+    return <h1>Hiya {props.name}</h1>;
+  }
+  const container = createContainer();
+
+  Didact.render(<App name="Harry" />, container);
+
+  await findByText(container, "Hiya Harry", {}, { container });
+});
+
+test.only("can update components with state", async () => {
+  function Counter() {
+    const [state, setState] = Didact.useState(1);
+    return <h1 onClick={() => setState(c => c + 1)}>Count: {state}</h1>;
+  }
+
+  const container = createContainer();
+
+  Didact.render(<Counter />, container);
+
+  let header = await findByText(container, "Count: 1", {}, { container });
+
+  fireEvent.click(header);
+
+  header = await findByText(container, "Count: 2", {}, { container });
+
+  fireEvent.click(header);
+
+  header = await findByText(container, "Count: 3", {}, { container });
+
+  fireEvent.click(header);
+
+  header = await findByText(container, "Count: 4", {}, { container });
 });
