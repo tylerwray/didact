@@ -1,0 +1,16 @@
+{
+  "presets": [
+    ["@babel/preset-env", { "targets": { "node": "current" } }],
+    "@babel/typescript"
+  ],
+  "plugins": [
+    [
+      "@babel/plugin-transform-react-jsx",
+      {
+        "pragma": "Didact.createFiber",
+        "pragmaFrag": "Didact.Fragment",
+        "throwIfNamespace": false // defaults to true
+      }
+    ]
+  ]
+}
