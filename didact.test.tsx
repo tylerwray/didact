@@ -1,5 +1,11 @@
 import Didact from "./didact";
-import { fireEvent, findByText } from "@testing-library/dom";
+import {
+  fireEvent,
+  findByText,
+  queryByText,
+  getByText,
+  wait
+} from "@testing-library/dom";
 
 afterEach(() => {
   Didact.unmount();
@@ -85,7 +91,7 @@ test("can render function components", async () => {
   await findByText(container, "Hiya Harry", {}, { container });
 });
 
-test.only("can update components with state", async () => {
+test("can update components with state", async () => {
   function Counter() {
     const [state, setState] = Didact.useState(1);
     return <h1 onClick={() => setState(c => c + 1)}>Count: {state}</h1>;
@@ -108,4 +114,75 @@ test.only("can update components with state", async () => {
   fireEvent.click(header);
 
   header = await findByText(container, "Count: 4", {}, { container });
+});
+
+test("can dynamically render components", async () => {
+  function Clicker() {
+    const [clicked, setClicked] = Didact.useState(false);
+
+    return (
+      <div>
+        {clicked && <span>Hello Moto</span>}
+        <button onClick={() => setClicked(c => !c)}>Click Me</button>
+      </div>
+    );
+  }
+
+  const container = createContainer();
+
+  Didact.render(<Clicker />, container);
+
+  await wait(() => expect(queryByText(container, "Hello Moto")).toBeNull());
+
+  const button = await findByText(container, "Click Me", {}, { container });
+
+  fireEvent.click(button);
+
+  await findByText(container, "Hello Moto", {}, { container });
+
+  fireEvent.click(button);
+
+  await wait(() => expect(queryByText(container, "Hello Moto")).toBeNull());
+
+  fireEvent.click(button);
+
+  await findByText(container, "Hello Moto", {}, { container });
+});
+
+test("can dynamically render children components", async () => {
+  function Child(props) {
+    if (!props.show) return null;
+    return <div>Hello Moto</div>;
+  }
+
+  function Clicker() {
+    const [clicked, setClicked] = Didact.useState(false);
+
+    return (
+      <div>
+        <Child show={clicked} />
+        <button onClick={() => setClicked(c => !c)}>Click Me</button>
+      </div>
+    );
+  }
+
+  const container = createContainer();
+
+  Didact.render(<Clicker />, container);
+
+  await wait(() => expect(queryByText(container, "Hello Moto")).toBeNull());
+
+  const button = await findByText(container, "Click Me", {}, { container });
+
+  fireEvent.click(button);
+
+  await findByText(container, "Hello Moto", {}, { container });
+
+  fireEvent.click(button);
+
+  await wait(() => expect(queryByText(container, "Hello Moto")).toBeNull());
+
+  fireEvent.click(button);
+
+  await findByText(container, "Hello Moto", {}, { container });
 });

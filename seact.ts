@@ -251,7 +251,6 @@ function updateHostComponent(fiber) {
     fiber.dom = createDOM(fiber);
   }
 
-  console.log(fiber);
   reconcileChildren(fiber, fiber.props.children);
 }
 
@@ -269,7 +268,7 @@ function reconcileChildren(wipFiber, elements) {
     if (sameType) {
       newFiber = {
         type: oldFiber.type,
-        props: elements.props,
+        props: element.props,
         dom: oldFiber.dom,
         parent: wipFiber,
         alternate: oldFiber,
